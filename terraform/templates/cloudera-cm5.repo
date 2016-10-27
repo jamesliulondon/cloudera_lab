@@ -1,0 +1,5 @@
+[cloudera-cm5.3.2-local]
+name=cloudera-cm5.3.2-local
+baseurl=file:///home/training/software/cloudera-cm5
+enabled=1
+gpgcheck=0

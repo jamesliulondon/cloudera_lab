@@ -1,0 +1,4 @@
+[cloudera-manager]
+name = Cloudera Manager, Version 5.3.2
+baseurl = http://lion:8050
+gpgcheck = 0

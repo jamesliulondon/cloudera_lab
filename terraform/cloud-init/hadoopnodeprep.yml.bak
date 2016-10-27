@@ -1,0 +1,30 @@
+#cloud-config
+hostname: '${tf_hostname}' # Substituted by Terraform
+manage_etc_hosts: true
+
+runcmd:
+    - [useradd, '-m', '-d', '/home/training', 'training']
+    - [mkdir, '-p', '-m', '0700', '/home/training/.ssh']
+    - [cp, '/tmp/cloudera-manager.repo', '/etc/yum.repos.d/cloudera-manager.repo']
+    - [cp, '/tmp/cloudera-cm5.repo', '/etc/yum.repos.d/cloudera-cm5.repo']
+    - [mv, '/tmp/training_public_key', '/home/training/.ssh/authorized_keys']
+    - [chmod, '400', '/home/training/.ssh/authorized_keys']
+    - [mv, '/tmp/id_rsa', '/home/training/.ssh/id_rsa']
+    - [chmod, '400', '/home/training/.ssh/id_rsa']
+    - [mv, '/tmp/sudofile', '/etc/sudoers.d/cdh']
+    - [chown, '-R', 'training.training', '/home/training/.ssh']
+    - [chown,  'root.root', '/etc/sudoers.d/cdh']
+    - '\sed -i "/HOSTNAME/s/=\(.*\)/=${tf_hostname}/" /etc/sysconfig/network'
+    - '\sed -i "/^#Port 22$/a Port 22"  /etc/ssh/sshd_config'
+    - '\sed -i "/^#Port 22$/a Port 443" /etc/ssh/sshd_config'
+    - '\sed -i "/^#PermitRootLogin yes$/c PermitRootLogin yes" /etc/ssh/sshd_config'
+    - '\sed -i "/^PermitRootLogin forced-commands-only$/c #PermitRootLogin forced-commands-only" /etc/ssh/sshd_config'
+    - '\sed -i "/^# User /a export PATH=\$PATH:~\/training_materials\/admin\/scripts\/" /home/training/.bashrc'
+    - [mv, '/root/.ssh/authorized_keys', '/root/.ssh/authorized_keys.bak']
+    - '\cat /root/.ssh/authorized_keys /home/training/.ssh/authorized_keys > /tmp/auth_root'
+    - [mv, '/tmp/auth_root', '/root/.ssh/authorized_keys']
+    - [chown, 'root.rooot', '/root/.ssh/authorized_keys']
+    - [chmod, '600', '/root/.ssh/authorized_keys']
+    - [wget,  '-O', '/root/masternode.tar', 'https://s3-eu-west-1.amazonaws.com/hadooplab-jliu/masternode.tar']
+    - [tar, '-C', '/home/training/', '-xvf', '/root/masternode.tar']
+    - [init, '6']

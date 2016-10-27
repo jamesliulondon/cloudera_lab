@@ -1,0 +1,7 @@
+#cloud-config
+hostname: '${tf_hostname}' # Substituted by Terraform
+manage_etc_hosts: true
+
+runcmd:
+    - '\sed -i "/HOSTNAME/s/=\(.*\)/=${tf_hostname}/" /etc/sysconfig/network'
+    - [init, '6']
